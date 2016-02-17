@@ -18,13 +18,9 @@ class Crawler
 		# there is also a timeout function which will time out after user specified time
 		attempts = 0
 		time = Time.now
-		until Website.depth >= depth || attempts > depth
+		until Website.depth >= depth || attempts > depth || (Time.now - time >= time_limit)
 			puts Website.depth
 			Website.latest_links.each do |website|
-				if (Time.now - time >= time_limit)
-					puts "outa time"
-					return 
-				end
 				self.website = website
 				proccess_url(website.url)
 			end
