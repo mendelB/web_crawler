@@ -1,0 +1,4 @@
+<div>
+  <%= hash_list_tag Website.where("depth_level = 1").first %>
+</div>
+<%= link_to("New Website", '/') %>

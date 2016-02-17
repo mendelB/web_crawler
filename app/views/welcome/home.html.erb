@@ -1,2 +1,10 @@
-<h1>Welcome#home</h1>
-<p>Find me in app/views/welcome/home.html.erb</p>
+<%= form_tag("/get-url", method: "get") do %>
+  <%= label_tag(:url, "Enter root URL to Crawl:") %>
+  <%= text_field_tag(:url, params[:url]) %></br>
+  <%= label_tag(:depth, "Enter the amount of levels deep into the site you'd like us to crawl:") %>
+  <%= number_field_tag(:depth, 2, min: 2) %></br>
+
+  <%= label_tag(:time, "Enter a time limit for the crawl (in seconds):") %>
+  <%= number_field_tag(:time, 60, min: 60) %></br>
+  <%= submit_tag("Crawl!") %>
+<% end %>
