@@ -5,6 +5,7 @@ class Crawler
 	attr_accessor :browser, :root, :website
 
 	def initialize(website, depth, time_limit)
+		@visited = []
 		@browser = Mechanize.new
 		@website = website
 		@root = website.url
@@ -18,9 +19,10 @@ class Crawler
 		# there is also a timeout function which will time out after user specified time
 		attempts = 0
 		time = Time.now
-		until Website.depth >= depth || attempts > depth || (Time.now - time >= time_limit)
+		until Website.depth >= depth || attempts > depth
 			puts Website.depth
 			Website.latest_links.each do |website|
+				return if Time.now - time >= time_limit
 				self.website = website
 				proccess_url(website.url)
 			end
@@ -33,6 +35,7 @@ class Crawler
 		# we'l fetch the page, call the links and for each link we will
 		# run a proccess on the link.
 		browser.get(url)
+		@visited << url
 		browser.page.links.each do |link|
 			proccess_link(link)
 		end
@@ -48,7 +51,7 @@ class Crawler
 			# we'l ensure the link isn't external if it is a relative link we'l add the
 			# root url to the beginning.
 			if !link.uri.host
-				url = root + link.href
+				url = root + (link.href[0] == '/' ? '' : '/') + link.href
 			elsif link.uri.host == root.gsub(/https?\:\/\/w?w?w?\./, '')
 			else
 				return 
@@ -61,7 +64,8 @@ class Crawler
 			webpage = Webpage.create(link_id: new_link.id, title: link.text)
 			webpage.create_website
 			# we'l log the url to have been proccessed
-			Proccessed.create(url: link.href)
+			# Proccessed.create(url: link.href)
+			@visited << link.href
 		end
 	end
 
@@ -70,7 +74,8 @@ class Crawler
 	end
 
 	def not_proccessed?(url)
-		!Proccessed.find_by(url: url)
+		# !Proccessed.find_by(url: url)
+		!@visited.include?(url)
 	end
 
 end
